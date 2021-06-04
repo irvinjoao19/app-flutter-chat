@@ -69,7 +69,7 @@ class __FormState extends State<_Form> {
             colorPrimaryText: Colors.white,
             title: 'Ingrese',
             onPress: () {
-              print("${emailCtrl.text} ${passCtrl.text}");
+              Navigator.pushReplacementNamed(context, 'chat');
             },
           )
         ],

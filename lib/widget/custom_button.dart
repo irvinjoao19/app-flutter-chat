@@ -4,7 +4,7 @@ class CustomButton extends StatelessWidget {
   final String title;
   final Color colorPrimary;
   final Color colorPrimaryText;
-  final Function onPress;
+  final VoidCallback onPress;
 
   const CustomButton({
     required this.title,
@@ -21,7 +21,7 @@ class CustomButton extends StatelessWidget {
         primary: this.colorPrimary,
         shape: StadiumBorder(),
       ),
-      onPressed: () {},
+      onPressed: this.onPress,
       child: Container(
         width: double.infinity,
         height: 55,
