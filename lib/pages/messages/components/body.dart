@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:app_chat/helper/util.dart';
+import 'package:app_chat/helpers/util.dart';
 import 'package:app_chat/models/ChatMessage.dart';
 
 import 'message.dart';
@@ -167,5 +167,13 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
 
     _message.insert(0, mensaje);
     mensaje.animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    for (Message message in _message) {
+      message.animationController.dispose();
+    }
+    super.dispose();
   }
 }

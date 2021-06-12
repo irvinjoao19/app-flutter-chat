@@ -1,34 +1,46 @@
-import 'package:app_chat/helper/util.dart';
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
+import 'package:app_chat/helpers/util.dart';
+import 'package:app_chat/services/auth_services.dart';
 
 class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+    final usuario = authService.usuario;
+
     return Scaffold(
-      appBar: buildAppBar(),
-      body: body(),
+      appBar: buildAppBar(usuario, context),
+      body: body(usuario),
     );
   }
 
-  AppBar buildAppBar() {
+  AppBar buildAppBar(usuario, context) {
     return AppBar(
+      iconTheme: IconThemeData(
+        color: Colors.black, //change your color here
+      ),
       elevation: 0,
       title: Text(
-        "Irvin",
+        usuario.email,
         style: TextStyle(color: kBlackColor),
       ),
       backgroundColor: kWhiteColor,
       actions: [
         IconButton(
-          color: kBlackColor,
           icon: Icon(Icons.logout_outlined),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, 'login');
+            AuthService.deleteToken();
+          },
         ),
       ],
     );
   }
 
-  Widget body() {
+  Widget body(usuario) {
     return Center(
       child: Container(
         margin: EdgeInsets.only(top: kDefaultPadding * 0.7),
@@ -39,7 +51,7 @@ class ProfilePage extends StatelessWidget {
               image: AssetImage('assets/images/user_2.png'),
             ),
             SizedBox(height: kDefaultPadding * 0.9),
-            Text('Irvin',
+            Text(usuario.nombre,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ],
         ),

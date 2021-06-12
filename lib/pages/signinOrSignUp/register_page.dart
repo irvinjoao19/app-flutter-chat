@@ -1,9 +1,15 @@
-import 'package:app_chat/widget/custom_button.dart';
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
+import 'package:app_chat/services/auth_services.dart';
 
 import 'package:app_chat/widget/logo.dart';
 import 'package:app_chat/widget/custom_input.dart';
+import 'package:app_chat/widget/custom_button.dart';
 import 'package:app_chat/widget/labels.dart';
+
+import 'package:app_chat/helpers/mostrar_alerta.dart';
 
 class RegisterPage extends StatelessWidget {
   @override
@@ -50,7 +56,7 @@ class __FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final sizeWidth = MediaQuery.of(context).size.width;
-
+    final authService = Provider.of<AuthService>(context);
     return Container(
       margin: EdgeInsets.only(top: 30),
       padding: EdgeInsets.symmetric(horizontal: sizeWidth * 0.10),
@@ -79,9 +85,21 @@ class __FormState extends State<_Form> {
             colorPrimary: Colors.blue,
             colorPrimaryText: Colors.white,
             title: 'Registrate',
-            onPress: () {
-              print("${emailCtrl.text} ${passCtrl.text}");
-            },
+            onPress: authService.autenticando
+                ? null
+                : () async {
+                    FocusScope.of(context).unfocus();
+                    final registroOk = await authService.register(
+                        nameCtrl.text.trim(),
+                        emailCtrl.text.trim(),
+                        passCtrl.text.trim());
+
+                    if (registroOk == true) {
+                      Navigator.pushReplacementNamed(context, 'chat');
+                    } else {
+                      mostrarAlerta(context, 'Registro Incorrecto', registroOk);
+                    }
+                  },
           )
         ],
       ),

@@ -5,7 +5,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:app_chat/pages/chats/components/chat_card.dart';
 import 'package:app_chat/pages/messages/message_screen.dart';
 import 'package:app_chat/models/Chat.dart';
-import 'package:app_chat/helper/util.dart';
+import 'package:app_chat/helpers/util.dart';
 
 class ChatPage extends StatefulWidget {
   @override
@@ -43,7 +43,14 @@ class _ChatPageState extends State<ChatPage> {
           _selectedIndex = value;
         });
         final routeName = (value == 3) ? 'profile' : 'chat';
-        Navigator.pushReplacementNamed(context, routeName);
+        Navigator.pushNamed(context, routeName);
+
+/* Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MessagesScreen(),
+          ),
+ */
       },
       items: [
         BottomNavigationBarItem(icon: Icon(Icons.messenger), label: "Chats"),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:app_chat/helper/util.dart';
+import 'package:app_chat/helpers/util.dart';
 
 class FillOutlineButton extends StatelessWidget {
   final bool isFilled;
