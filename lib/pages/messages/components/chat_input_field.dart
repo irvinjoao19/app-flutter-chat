@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:app_chat/helpers/util.dart';
-import 'package:app_chat/models/ChatMessage.dart';
+//import 'package:app_chat/models/ChatMessage.dart';
 
 class ChatInputField extends StatefulWidget {
   @override
@@ -12,7 +12,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
 
   final _focusNode = FocusNode();
 
-  bool _isWriting = false;
+  //bool _isWriting = false;
 
   @override
   Widget build(BuildContext context) {
@@ -62,14 +62,14 @@ class _ChatInputFieldState extends State<ChatInputField> {
                         controller: _textController,
                         minLines: 1,
                         maxLines: 5,
-                        onSubmitted: _submit,
+                        onSubmitted: null,
                         onChanged: (text) {
                           setState(() {
-                            if (text.trim().length > 0) {
+                            /*   if (text.trim().length > 0) {
                               _isWriting = true;
                             } else {
                               _isWriting = false;
-                            }
+                            } */
                           });
                         },
                         decoration: InputDecoration(
@@ -107,12 +107,11 @@ class _ChatInputFieldState extends State<ChatInputField> {
               ), */
               child: IconTheme(
                 data: IconThemeData(color: kPrimaryColor),
-                child: IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: _isWriting
+                child: IconButton(icon: Icon(Icons.send), onPressed: null
+                    /*   onPressed: _isWriting
                       ? () => _submit(_textController.text.trim())
-                      : null,
-                ),
+                      : null, */
+                    ),
               ),
             )
           ],
@@ -121,7 +120,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
     );
   }
 
-  _submit(String texto) {
+/*   _submit(String texto) {
     _textController.clear();
     _focusNode.requestFocus();
     setState(() {
@@ -141,5 +140,5 @@ class _ChatInputFieldState extends State<ChatInputField> {
     );
     mensaje.animationController.forward(); */
     demeChatMessages.insert(0, message);
-  }
+  } */
 }

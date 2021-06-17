@@ -1,7 +1,11 @@
+import 'package:app_chat/services/auth_services.dart';
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
 
 import 'package:app_chat/helpers/util.dart';
 import 'package:app_chat/models/ChatMessage.dart';
+import 'package:app_chat/services/chat_services.dart';
 
 import 'audio_message.dart';
 import 'text_message.dart';
@@ -31,6 +35,8 @@ class Message extends StatelessWidget {
       }
     }
 
+    final chatService = Provider.of<ChatService>(context);
+    final authService = Provider.of<AuthService>(context, listen: false);
     return FadeTransition(
       opacity: animationController,
       child: SizeTransition(
@@ -39,19 +45,19 @@ class Message extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(top: kDefaultPadding),
           child: Row(
-            mainAxisAlignment: message.isSender
+            mainAxisAlignment: message.uid == authService.usuario.uid
                 ? MainAxisAlignment.end
                 : MainAxisAlignment.start,
             children: [
-              if (!message.isSender) ...[
+              if (!(message.uid == authService.usuario.uid)) ...[
                 CircleAvatar(
                   radius: 12,
-                  backgroundImage: AssetImage("assets/images/user_2.png"),
+                  backgroundImage: AssetImage(chatService.usuarioPara.image),
                 ),
                 SizedBox(width: kDefaultPadding / 2),
               ],
               messageContaint(message),
-              if (message.isSender)
+              if (message.uid == authService.usuario.uid)
                 MessageStatusDot(status: message.messageStatus)
             ],
           ),

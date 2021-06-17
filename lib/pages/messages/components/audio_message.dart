@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
 import 'package:app_chat/helpers/util.dart';
 import 'package:app_chat/models/ChatMessage.dart';
+import 'package:app_chat/services/auth_services.dart';
 
 class AudioMessage extends StatelessWidget {
   final ChatMessage message;
@@ -9,6 +12,7 @@ class AudioMessage extends StatelessWidget {
   const AudioMessage({required this.message});
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context, listen: false);
     return Container(
       width: MediaQuery.of(context).size.width * 0.55,
       padding: EdgeInsets.symmetric(
@@ -17,13 +21,16 @@ class AudioMessage extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
-        color: kPrimaryColor.withOpacity(message.isSender ? 1 : 0.1),
+        color: kPrimaryColor
+            .withOpacity(message.uid == authService.usuario.uid ? 1 : 0.1),
       ),
       child: Row(
         children: [
           Icon(
             Icons.play_arrow,
-            color: message.isSender ? Colors.white : kPrimaryColor,
+            color: message.uid == authService.usuario.uid
+                ? Colors.white
+                : kPrimaryColor,
           ),
           Expanded(
             child: Padding(
@@ -36,7 +43,7 @@ class AudioMessage extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     height: 2,
-                    color: message.isSender
+                    color: message.uid == authService.usuario.uid
                         ? Colors.white
                         : kPrimaryColor.withOpacity(0.4),
                   ),
@@ -46,7 +53,9 @@ class AudioMessage extends StatelessWidget {
                       height: 8,
                       width: 8,
                       decoration: BoxDecoration(
-                        color: message.isSender ? Colors.white : kPrimaryColor,
+                        color: message.uid == authService.usuario.uid
+                            ? Colors.white
+                            : kPrimaryColor,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -58,7 +67,10 @@ class AudioMessage extends StatelessWidget {
           Text(
             "0.37",
             style: TextStyle(
-                fontSize: 12, color: message.isSender ? Colors.white : null),
+                fontSize: 12,
+                color: message.uid == authService.usuario.uid
+                    ? Colors.white
+                    : null),
           ),
         ],
       ),

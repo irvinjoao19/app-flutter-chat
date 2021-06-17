@@ -4,39 +4,38 @@ import 'package:provider/provider.dart';
 
 import 'package:app_chat/helpers/util.dart';
 import 'package:app_chat/services/auth_services.dart';
+import 'package:app_chat/services/socket.dart';
 
 class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
+    final socket = Provider.of<SocketService>(context);
     final usuario = authService.usuario;
 
     return Scaffold(
-      appBar: buildAppBar(usuario, context),
-      body: body(usuario),
-    );
-  }
-
-  AppBar buildAppBar(usuario, context) {
-    return AppBar(
-      iconTheme: IconThemeData(
-        color: Colors.black, //change your color here
-      ),
-      elevation: 0,
-      title: Text(
-        usuario.email,
-        style: TextStyle(color: kBlackColor),
-      ),
-      backgroundColor: kWhiteColor,
-      actions: [
-        IconButton(
-          icon: Icon(Icons.logout_outlined),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, 'login');
-            AuthService.deleteToken();
-          },
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.black, //change your color here
         ),
-      ],
+        elevation: 0,
+        title: Text(
+          usuario.email,
+          style: TextStyle(color: kBlackColor),
+        ),
+        backgroundColor: kWhiteColor,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout_outlined),
+            onPressed: () {
+              socket.disconnect();
+              Navigator.pushReplacementNamed(context, 'login');
+              AuthService.deleteToken();
+            },
+          ),
+        ],
+      ),
+      body: body(usuario),
     );
   }
 
@@ -48,7 +47,7 @@ class ProfilePage extends StatelessWidget {
           children: [
             Image(
               width: 200,
-              image: AssetImage('assets/images/user_2.png'),
+              image: AssetImage(usuario.image),
             ),
             SizedBox(height: kDefaultPadding * 0.9),
             Text(usuario.nombre,

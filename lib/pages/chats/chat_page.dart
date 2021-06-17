@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+import 'package:app_chat/helpers/util.dart';
+
+import 'package:app_chat/services/usuarios_services.dart';
+import 'package:app_chat/services/socket.dart';
+import 'package:app_chat/services/chat_services.dart';
+import 'package:app_chat/services/auth_services.dart';
 
 import 'package:app_chat/pages/chats/components/chat_card.dart';
 import 'package:app_chat/pages/messages/message_screen.dart';
-import 'package:app_chat/models/Chat.dart';
-import 'package:app_chat/helpers/util.dart';
+
+import 'package:app_chat/models/usuario.dart';
 
 class ChatPage extends StatefulWidget {
   @override
@@ -13,10 +21,19 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  final usuarioService = new UsuarioService();
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
+  List<Usuario> users = [];
   int _selectedIndex = 1;
+
+  @override
+  void initState() {
+    this._downloadData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,11 +47,14 @@ class _ChatPageState extends State<ChatPage> {
           color: Colors.white,
         ),
       ),
-      bottomNavigationBar: buildBottomNavigationBar(),
+      bottomNavigationBar: buildBottomNavigationBar(context),
     );
   }
 
-  BottomNavigationBar buildBottomNavigationBar() {
+  BottomNavigationBar buildBottomNavigationBar(BuildContext context) {
+    final socket = Provider.of<SocketService>(context);
+    final authService = Provider.of<AuthService>(context);
+
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       currentIndex: _selectedIndex,
@@ -44,24 +64,38 @@ class _ChatPageState extends State<ChatPage> {
         });
         final routeName = (value == 3) ? 'profile' : 'chat';
         Navigator.pushNamed(context, routeName);
-
-/* Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MessagesScreen(),
-          ),
- */
       },
       items: [
         BottomNavigationBarItem(icon: Icon(Icons.messenger), label: "Chats"),
         BottomNavigationBarItem(icon: Icon(Icons.people), label: "People"),
         BottomNavigationBarItem(icon: Icon(Icons.call), label: "Calls"),
         BottomNavigationBarItem(
-          icon: CircleAvatar(
-            radius: 14,
-            backgroundImage: AssetImage("assets/images/user_2.png"),
+          icon: Stack(
+            children: [
+              CircleAvatar(
+                radius: 14,
+                backgroundImage: AssetImage(authService.usuario.image),
+              ),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  height: 11,
+                  width: 11,
+                  decoration: BoxDecoration(
+                    color: (socket.serverStatus == ServerStatus.Online)
+                        ? kConnectColor
+                        : kDisconnectColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        width: 2),
+                  ),
+                ),
+              )
+            ],
           ),
-          label: "Profile",
+          label: "Yo",
         ),
       ],
     );
@@ -118,22 +152,26 @@ class _ChatPageState extends State<ChatPage> {
 
   ListView _chatList() {
     return ListView.builder(
-      itemCount: chatsData.length,
+      itemCount: users.length,
       itemBuilder: (context, index) => ChatCard(
-        chat: chatsData[index],
-        press: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MessagesScreen(),
-          ),
-        ),
-      ),
+          user: users[index],
+          press: () {
+            final chatService =
+                Provider.of<ChatService>(context, listen: false);
+            chatService.usuarioPara = users[index];
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MessagesScreen(),
+              ),
+            );
+          }),
     );
   }
 
   _downloadData() async {
-    await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use refreshFailed()
+    this.users = await usuarioService.getUsuarios();
+    if (mounted) setState(() {});
     _refreshController.refreshCompleted();
   }
 }

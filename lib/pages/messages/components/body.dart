@@ -1,4 +1,11 @@
+import 'package:app_chat/models/mensajes_response.dart';
+import 'package:app_chat/services/auth_services.dart';
 import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+
+import 'package:app_chat/services/chat_services.dart';
+import 'package:app_chat/services/socket.dart';
 
 import 'package:app_chat/helpers/util.dart';
 import 'package:app_chat/models/ChatMessage.dart';
@@ -19,21 +26,74 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
 
   List<Message> _message = [];
 
+  late ChatService chatService;
+  late SocketService socketService;
+  late AuthService authService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    this.chatService = Provider.of<ChatService>(context, listen: false);
+    this.socketService = Provider.of<SocketService>(context, listen: false);
+    this.authService = Provider.of<AuthService>(context, listen: false);
+
+    this.socketService.socket.on('mensaje-personal', _escucharMensaje);
+    _cargarHistorial(this.chatService.usuarioPara.uid);
+  }
+
+  void _cargarHistorial(String uid) async {
+    List<Mensaje> chat = await this.chatService.getChat(uid);
+    final history = chat.map((m) => Message(
+          message: new ChatMessage(
+              text: m.mensaje,
+              uid: m.de,
+              messageType: ChatMessageType.text,
+              messageStatus: MessageStatus.viewed),
+          animationController: AnimationController(
+              vsync: this, duration: Duration(milliseconds: 400))
+            ..forward(),
+        ));
+    setState(() {
+      _message.insertAll(0, history);
+    });
+  }
+
+  void _escucharMensaje(dynamic payload) {
+    final mensaje = Message(
+      message: new ChatMessage(
+          text: payload['mensaje'],
+          uid: payload['de'],
+          messageType: ChatMessageType.text,
+          messageStatus: MessageStatus.viewed),
+      animationController: AnimationController(
+          vsync: this, duration: Duration(milliseconds: 400)),
+    );
+
+    setState(() {
+      _message.insert(0, mensaje);
+    });
+
+    mensaje.animationController.forward();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Expanded(
-            child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
-          child: ListView.builder(
-            physics: BouncingScrollPhysics(),
-            itemCount: _message.length,
-            reverse: true,
-            itemBuilder: (context, index) => _message[index],
-            //Message(message: demeChatMessages[index]),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+            child: ListView.builder(
+              physics: BouncingScrollPhysics(),
+              itemCount: _message.length,
+              reverse: true,
+              itemBuilder: (context, index) => _message[index],
+              //Message(message: demeChatMessages[index]),
+            ),
           ),
-        )),
+        ),
+        SizedBox(height: 5),
         chatInputField(),
       ],
     );
@@ -51,7 +111,7 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
           BoxShadow(
             offset: Offset(0, 4),
             blurRadius: 32,
-            color: Color(0xFF087949).withOpacity(0.08),
+            color: kPrimaryColor.withOpacity(0.08),
           ),
         ],
       ),
@@ -148,16 +208,12 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
   _submit(String texto) {
     _textController.clear();
     _focusNode.requestFocus();
-    setState(() {
-      _isWriting = false;
-    });
 
     final message = new ChatMessage(
-      text: texto,
-      messageType: ChatMessageType.text,
-      messageStatus: MessageStatus.viewed,
-      isSender: true,
-    );
+        text: texto,
+        uid: this.authService.usuario.uid,
+        messageType: ChatMessageType.text,
+        messageStatus: MessageStatus.viewed);
 
     final mensaje = Message(
       message: message,
@@ -167,6 +223,16 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
 
     _message.insert(0, mensaje);
     mensaje.animationController.forward();
+
+    setState(() {
+      _isWriting = false;
+    });
+
+    this.socketService.socket.emit('mensaje-personal', {
+      'de': this.authService.usuario.uid,
+      'para': this.chatService.usuarioPara.uid,
+      'mensaje': texto
+    });
   }
 
   @override
@@ -174,6 +240,7 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
     for (Message message in _message) {
       message.animationController.dispose();
     }
+    this.socketService.socket.off('mensaje-personal');
     super.dispose();
   }
 }

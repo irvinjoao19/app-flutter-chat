@@ -1,13 +1,13 @@
 import 'package:app_chat/helpers/util.dart';
-import 'package:app_chat/models/Chat.dart';
+import 'package:app_chat/models/usuario.dart';
 import 'package:flutter/material.dart';
 
 class ChatCard extends StatelessWidget {
-  final Chat chat;
+  final Usuario user;
   final VoidCallback press;
 
   const ChatCard({
-    required this.chat,
+    required this.user,
     required this.press,
   });
 
@@ -24,9 +24,9 @@ class ChatCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundImage: AssetImage(chat.image),
+                  backgroundImage: AssetImage(user.image),
                 ),
-                if (chat.isActive)
+                if (user.online)
                   Positioned(
                     right: 0,
                     bottom: 0,
@@ -52,7 +52,7 @@ class ChatCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      chat.name,
+                      user.nombre,
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
@@ -60,7 +60,7 @@ class ChatCard extends StatelessWidget {
                     Opacity(
                       opacity: 0.64,
                       child: Text(
-                        chat.lastMessage,
+                        user.email,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -69,10 +69,10 @@ class ChatCard extends StatelessWidget {
                 ),
               ),
             ),
-            Opacity(
+            /*    Opacity(
               opacity: 0.64,
               child: Text(chat.time),
-            ),
+            ), */
           ],
         ),
       ),

@@ -5,17 +5,17 @@ class ChatMessage {
   final String text;
   final ChatMessageType messageType;
   final MessageStatus messageStatus;
-  final bool isSender;
+  final String uid;
 
   ChatMessage({
     this.text = "",
     required this.messageType,
     required this.messageStatus,
-    required this.isSender,
+    required this.uid,
   });
 }
 
-List demeChatMessages = [
+/* List demeChatMessages = [
   ChatMessage(
     text: "Hi Sajol,",
     messageType: ChatMessageType.text,
@@ -59,3 +59,4 @@ List demeChatMessages = [
     isSender: true,
   ),
 ];
+ */

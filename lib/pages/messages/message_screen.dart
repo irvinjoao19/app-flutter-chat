@@ -1,36 +1,43 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
 import 'components/body.dart';
 import 'package:app_chat/helpers/util.dart';
+
+import 'package:app_chat/services/chat_services.dart';
 
 class MessagesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final chatService = Provider.of<ChatService>(context);
+    final usuarioPara = chatService.usuarioPara;
+
     return Scaffold(
-      appBar: buildAppBar(),
+      appBar: _buildAppBar(usuarioPara),
       body: Body(),
     );
   }
 
-  AppBar buildAppBar() {
+  AppBar _buildAppBar(usuarioPara) {
     return AppBar(
       automaticallyImplyLeading: false,
       title: Row(
         children: [
           BackButton(),
           CircleAvatar(
-            backgroundImage: AssetImage("assets/images/user_2.png"),
+            backgroundImage: AssetImage(usuarioPara.image),
           ),
           SizedBox(width: kDefaultPadding * 0.75),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Kristin Watson",
+                usuarioPara.nombre,
                 style: TextStyle(fontSize: 16),
               ),
               Text(
-                "Active 3m ago",
+                usuarioPara.email,
                 style: TextStyle(fontSize: 12),
               )
             ],

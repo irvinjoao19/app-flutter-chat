@@ -1,4 +1,5 @@
 import 'package:app_chat/helpers/mostrar_alerta.dart';
+import 'package:app_chat/services/socket.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -51,6 +52,7 @@ class __FormState extends State<_Form> {
   Widget build(BuildContext context) {
     final sizeWidth = MediaQuery.of(context).size.width;
     final authService = Provider.of<AuthService>(context);
+    final socket = Provider.of<SocketService>(context);
     return Container(
       margin: EdgeInsets.only(top: 30),
       padding: EdgeInsets.symmetric(horizontal: sizeWidth * 0.10),
@@ -81,6 +83,7 @@ class __FormState extends State<_Form> {
                         emailCtrl.text.trim(), passCtrl.text.trim());
 
                     if (loginOk) {
+                      socket.connect();
                       Navigator.pushReplacementNamed(context, 'chat');
                     } else {
                       mostrarAlerta(context, 'Login Incorrecto',
